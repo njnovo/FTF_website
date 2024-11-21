@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fund the Future - Main Calendar</title>
+    <!-- Include FullCalendar CSS and JS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.0/main.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+    <link type="text/css" rel="stylesheet" href="css/materialize.min.css"  media="screen,projection"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <link rel="stylesheet" href="calendar.css">
+    <style>
+        #calendar-container {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+        #event-form {
+            margin: 20px auto;
+            text-align: center;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 1000;
+        }
+        .modal-content {
+            background-color: white;
+            margin: 15% auto;
+            padding: 20px;
+            border-radius: 8px;
+            width: 80%;
+            max-width: 500px;
+            position: relative;
+        }
+        .close-button {
+            position: absolute;
+            right: 10px;
+            top: 10px;
+            font-size: 24px;
+            cursor: pointer;
+            color: #212529;
+        }
+        .close-button:hover {
+            color: #000;
+        }
+        .event-list {
+            margin-top: 20px;
+        }
+        .event-item {
+            padding: 10px;
+            margin: 5px 0;
+            background-color: #f8f9fa;
+            border-radius: 4px;
+            border-left: 4px solid #0d6efd;
+        }
+        .event-time {
+            font-weight: bold;
+            color: #666;
+        }
+        .no-events {
+            text-align: center;
+            color: #666;
+            padding: 20px;
+        }
+        #event-form input {
+            margin: 10px 0;
+            padding: 8px;
+            width: 100%;
+            max-width: 300px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        #event-form button {
+            margin-top: 10px;
+            padding: 8px 16px;
+            background-color: #0d6efd;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        #event-form button:hover {
+            background-color: #0b5ed7;
+        }
+    </style>
+</head>
+<body>
+<!-- Fixed Navbar -->
+<nav class="navbar navbar-expand-lg navbar-light bg-white fixed-top">
+    <div class="container">
+        <a class="navbar-brand" href="#">Fund the Future</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link" href="../about.html">About Us</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../index.html">Home</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../apply.html">Apply For a Grant</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../donate.html">Donate</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="../contact.html">Contact</a>
+                </li>
+                <li class="nav-item dropdown">
+                    <a class="nav-link dropdown-toggle" href="#" id="navbarDropdownMenuLink" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                        Calendars
+                    </a>
+                    <ul class="dropdown-menu" aria-labelledby="navbarDropdownMenuLink">
+                        <li><a class="dropdown-item" href="/calendars/calendar.html">Main Calendar</a></li>
+                        <li><a class="dropdown-item" href="/calendars/cchscalendar.html">CCHS Calendar</a></li>
+                    </ul>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<br>
+<!-- top section -->
+<section class="hero-section niels-bg-img" id="home">
+
+    <div class="container text-center">
+        <div id="niels-home-pos">
+            <br>
+            <h1 class="display-4 fw-bold mb-4">Main Calendar</h1>
+        </div>
+    </div>
+</section>
+
+<div id="calendar-container">
+    <div id="calendar"></div>
+</div>
+
+<!-- Daily Events Modal -->
+<div id="eventsModal" class="modal">
+    <div class="modal-content">
+        <span class="close-button" onclick="closeModal()">&times;</span>
+        <h3 id="modalDate">Events for </h3>
+        <div id="eventsList" class="event-list">
+            <!-- Events will be inserted here -->
+        </div>
+    </div>
+</div>
+
+<div id="event-form">
+    <h3>Add Main Event</h3>
+    <input type="text" id="event-title" placeholder="Event Title" required>
+    <input type="date" id="event-date" required>
+    <input type="time" id="event-time" required>
+    <input type="password" id="password" placeholder="Enter Password" required>
+    <button type="submit" onclick="addEvent()">Add Event</button>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.6/dist/umd/popper.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+    const JSON_BIN_ID = "67225e4bacd3cb34a89f9ff2";
+    const API_KEY = "$2b$10$zSL1Sz0T.cqwEbcO0uUYduVUSC8hiMelv0OlDmZPtIcleAL9wl65y";
+    const PASSWORD = "plzDontHack";
+    let calendar;
+
+    // Load events from JSON Bin
+    async function loadEvents() {
+        const response = await fetch(`https://api.jsonbin.io/v3/b/${JSON_BIN_ID}/latest`, {
+            headers: { "X-Master-Key": API_KEY }
+        });
+        const data = await response.json();
+        return {
+            allData: data.record,  // Keep the complete record
+            mainEvents: data.record.main  // Return main events for calendar
+        };
+    }
+
+    // Format date for display
+    function formatDate(date) {
+        return new Date(date).toLocaleDateString('en-US', {
+            weekday: 'long',
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric'
+        });
+    }
+
+    // Format time for display
+    function formatTime(dateString) {
+        return new Date(dateString).toLocaleTimeString('en-US', {
+            hour: 'numeric',
+            minute: '2-digit'
+        });
+    }
+
+    // Show modal with events for selected date
+    function showEventsForDate(date, events) {
+        const modal = document.getElementById('eventsModal');
+        const modalDate = document.getElementById('modalDate');
+        const eventsList = document.getElementById('eventsList');
+
+        // Clear previous events
+        eventsList.innerHTML = '';
+
+        // Set modal date
+        modalDate.textContent = `Events for ${formatDate(date)}`;
+
+        // Filter events for selected date
+        const dayEvents = events.filter(event => {
+            const eventDate = new Date(event.start);
+            return eventDate.toDateString() === date.toDateString();
+        });
+
+        // Sort events by time
+        dayEvents.sort((a, b) => new Date(a.start) - new Date(b.start));
+
+        // Display events or "No events" message
+        if (dayEvents.length > 0) {
+            dayEvents.forEach(event => {
+                const eventElement = document.createElement('div');
+                eventElement.className = 'event-item';
+                eventElement.innerHTML = `
+                    <div class="event-time">${formatTime(event.start)}</div>
+                    <div class="event-title">${event.title}</div>
+                `;
+                eventsList.appendChild(eventElement);
+            });
+        } else {
+            eventsList.innerHTML = '<div class="no-events">No events scheduled for this day</div>';
+        }
+
+        // Show modal
+        modal.style.display = 'block';
+    }
+
+    // Close modal
+    function closeModal() {
+        document.getElementById('eventsModal').style.display = 'none';
+    }
+
+    // Initialize Calendar
+    document.addEventListener('DOMContentLoaded', async function() {
+        const { mainEvents } = await loadEvents();
+        const calendarEl = document.getElementById('calendar');
+        calendar = new FullCalendar.Calendar(calendarEl, {
+            initialView: 'dayGridMonth',
+            events: mainEvents,
+            dateClick: function(info) {
+                showEventsForDate(info.date, mainEvents);
+            }
+        });
+        calendar.render();
+
+        // Close modal when clicking outside
+        window.onclick = function(event) {
+            const modal = document.getElementById('eventsModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        }
+    });
+
+    // Add Event to JSON Bin
+    async function addEvent() {
+        const title = document.getElementById('event-title').value;
+        const date = document.getElementById('event-date').value;
+        const time = document.getElementById('event-time').value;
+        const password = document.getElementById('password').value;
+
+        if (password !== PASSWORD) {
+            alert("Incorrect password. Event not added.");
+            return;
+        }
+
+        const startDateTime = `${date}T${time}:00`;
+        const newEvent = { title, start: startDateTime };
+
+        try {
+            // Get current complete data
+            const { allData, mainEvents } = await loadEvents();
+
+            // Update only the main events
+            const updatedMainEvents = [...mainEvents, newEvent];
+
+            // Prepare the complete updated data
+            const updatedData = {
+                ...allData,  // Preserve all other data
+                main: updatedMainEvents  // Update only main events
+            };
+
+            // Send the complete updated data
+            const response = await fetch(`https://api.jsonbin.io/v3/b/${JSON_BIN_ID}`, {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-Master-Key": API_KEY
+                },
+                body: JSON.stringify(updatedData)
+            });
+
+            if (!response.ok) throw new Error('Failed to update events');
+
+            alert("Event added successfully!");
+
+            // Re-render calendar with updated events
+            calendar.removeAllEvents();
+            calendar.addEventSource(updatedMainEvents);
+
+            // Clear form fields
+            document.getElementById('event-title').value = '';
+            document.getElementById('event-date').value = '';
+            document.getElementById('event-time').value = '';
+            document.getElementById('password').value = '';
+        } catch (error) {
+            console.error('Error:', error);
+            alert("Failed to add event. Please try again.");
+        }
+    }
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
